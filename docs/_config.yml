@@ -5,7 +5,7 @@ description: >-
   programming language based on forth which is designed to run on the 5vm
   one-instruction-set-computer.
 baseurl: "/fithlang"
-url: "https://mishaklopukh.github.com"
+url: "https://mishaklopukh.github.io"
 github_username:  MishaKlopukh
 
 remote_theme: pmarsceill/just-the-docs
