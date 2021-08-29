@@ -1,0 +1,18 @@
+title: Fith Docs
+email: mklopukh2019@fau.edu
+description: >-
+  Documentation for the Fith programming language. Fith is a stack-based
+  programming language based on forth which is designed to run on the 5vm
+  one-instruction-set-computer.
+baseurl: "/fithlang"
+url: "https://mishaklopukh.github.com"
+github_username:  MishaKlopukh
+
+theme: just-the-docs
+plugins:
+  - jekyll-feed
+
+aux_links:
+  "Source on GitHub":
+    - "//github.com/MishaKlopukh/fithlang"
+
