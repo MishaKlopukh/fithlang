@@ -8,9 +8,8 @@ baseurl: "/fithlang"
 url: "https://mishaklopukh.github.com"
 github_username:  MishaKlopukh
 
+remote_theme: pmarsceill/just-the-docs
 theme: just-the-docs
-plugins:
-  - jekyll-feed
 
 aux_links:
   "Source on GitHub":
