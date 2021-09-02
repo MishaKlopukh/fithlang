@@ -8,10 +8,17 @@ def assemble(*sections, literal_section = [], extra_symbols = dict(), fs_len=100
     symbols = {'0':17,'1':19,'fp': 20,'sp': 21, '_start': len(machine)}
     symbols.update(extra_symbols)
     for idx,section in enumerate(sections):
+        comment = False
         for value in section.split():
             if value[1:4] == 'loc':
                 value = f'{value[0]}s{idx}{value[1:]}'
-            if value.startswith('.'):
+            if comment:
+                if value.endswith('*/'):
+                    comment = False
+                pass
+            elif value.startswith('/*'):
+                comment = True
+            elif value.startswith('.'):
                 symbols[value[1:]] = len(machine)
             else:
                 machine.append(value)

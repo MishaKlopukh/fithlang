@@ -4,20 +4,20 @@ def fithc(fith, *includes, locoffset=0):
     words = {'_start': []} # Dictionary of fith words
     fvars = [] # List of variables
     def call(word): # Call a fith word
-        return [
+        return ['\n'
             ':fp','+2','+2',-1,'+11','+10', # Push return address to function stack
             ':1',2,':fp',1,4,':fp', # increment the function stack pointer
-            '+2',0,':'+word # Jump to word
+            '+2',0,':'+word, # Jump to word
+            f'/* call({word}) */'
         ]
     def call_cond(word1, word2): # Call one of two fith words based on condition on the stack
-        return [
-            ':fp','+2','+2',-1,'+40','+39', # Push return address to function stack
+        return ['\n'
+            ':fp','+2','+2',-1,'+26','+25', # Push return address to function stack
             ':1',2,':fp',1,4,':fp', # increment the function stack pointer
-            ':sp','+1',-1,'+19', # Grab condition
+            ':sp','+11', # Grab condition
             ':1',2,':sp',1,5,':sp', # decrement the stack pointer
-            0,1,'+2',2,14,14,4,1,'+2',2,'+9','+8',-1,3,15,0, # execute conditional jump over call to else
-            '+2',0,':'+word1, # Jump to word1
-            '+2',0,':'+word2 # Jump to word2
+            '+8',1,'+7',2,-1,3,15,0,':'+word1,':'+word2, # execute conditional jump to word 1 or 2
+            f'/* call_cond({word1},{word2}) */'
         ]
     def push(word): # Push a value to the stack
         nonlocal fvars
@@ -25,13 +25,19 @@ def fithc(fith, *includes, locoffset=0):
             word = int(word)
         except:
             if word.startswith("`"):
-                return sum((push(ord(char)) for char in word[-1:0:-1]),[])
-            if not word in fvars:
+                if len(word)>=3:
+                    return sum((push(ord(char)) for char in word.replace('_',' ').replace('\\_','_').replace('\\\\n','\n')[-1:0:-1]),push(0))
+                else:
+                    return push(ord(word[1]))
+            if word.startswith("@"):
+                word = word[1:]
+            elif not word in fvars:
                 fvars += [word]
             word = ':'+word
-        return [
+        return ['\n'
             ':1',2,':sp',1,4,':sp', # increment the stack pointer
-            ':sp','+2','+2',-1,word,word # Push word to stack
+            ':sp','+2','+2',-1,word,word, # Push word to stack
+            f'/* push({word}) */'
         ]
     locix = locoffset-1 # Lambda (conditional) index
     literal = None # Machine code definition
@@ -50,8 +56,9 @@ def fithc(fith, *includes, locoffset=0):
             else:
                 literal += [word]
         elif word == '[': # Literal insertion
-            literal = []
+            literal = ['\n']
         elif word == ';': # Pop definition
+            defining[-1] += ['\n:1 2 :fp 1 5 :fp :fp +1 -1 0 /* return */'] # return from function
             defining.pop()
         elif word.lower() == 'if': # Special word: IF
             locix += 1
@@ -59,6 +66,7 @@ def fithc(fith, *includes, locoffset=0):
             words[f'loc{locix}'], words[f'loc{locix}.else'] = [], []
             defining.append(words[f'loc{locix}'])
         elif word.lower() == 'else': # Special word: ELSE
+            defining[-1] += ['\n:1 2 :fp 1 5 :fp :fp +1 -1 0 /* return */'] # return from function
             defining[-1] = words[f'loc{locix}.else']
         elif word.lower() == 'do': # Special word: DO (lambda)
             locix += 1
@@ -76,13 +84,13 @@ def fithc(fith, *includes, locoffset=0):
             defining[-1] += call(word.lower())
         else: # Push a value to the stack
            defining[-1] += push(word)
-    words['_start'] += ['+4',1,'+2',0,0] # Halt machine
+    words['_start'] += ['\n''+4',1,'+2',0,0,'/* Halt */'] # Halt machine
     fir = ""
     for var in fvars: # Add variables to machine
         fir += f'.{var}\n0\n'
     for word in words: # Add word definitions to machine
-        wval = ''.join(str(ins)+('\n' if idx%30==29 else ' ') for idx,ins in enumerate(words[word]))
-        fir += f'.{word}\n{wval}\n:1 2 :fp 1 5 :fp :fp +1 -1 0\n'
+        sdword = ' '.join(map(str,words[word])) if words[word] != [] else '\n:1 2 :fp 1 5 :fp :fp +1 -1 0 /* nop return */'
+        fir += f'.{word}\n{sdword}\n\n'
     return fir
 def main():
     import os
