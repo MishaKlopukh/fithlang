@@ -16,11 +16,15 @@ Memory 0 to 15 is reserved for special purposes as follows:
 *   8: A > B
 *   9: A < B
 *   10: A == B
-*   11: Input Register, Not currently implemented in the reference 5vm.
-*   12: Output Register. Outputs ascii when nonzero, clears every step.
+*   11: Input Register, Reads a charachter from stdin when read from.
+*   12: Output Register. Outputs to stdout when written to.
 *   13: logical not C
 *   14: A bitwise xor B
 *   15: A if C!=0 else B
+
+## Boolean Values
+
+0 is True, anything other than 0 is False. By convention, -1 is False.
 
 ## Execution
 Execution of code begins at memory location 16. 

@@ -13,4 +13,7 @@ forms:
 - Labels can have offsets by adding `+` and a positive or negative offset after the label.
 - Label definitions are symbols starting with `.` and are not included in the machine code.
 
+The `5ir` format supports comments starting with `/*` and ending
+in `*/`
+
 The contents of literal insertions are also in the `5ir` format.
