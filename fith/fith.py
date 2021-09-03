@@ -2,7 +2,7 @@ def fithc(fith, *includes, locoffset=0):
     """Compiles a fith program for the 5vm"""
     fith = '\n'.join(includes+(fith,))
     words = {'_start': []} # Dictionary of fith words
-    fvars = [] # List of variables
+    fvars = {} # List of variables
     def call(word): # Call a fith word
         return ['\n'
             ':fp','+2','+2',-1,'+11','+10', # Push return address to function stack
@@ -29,10 +29,18 @@ def fithc(fith, *includes, locoffset=0):
                     return sum((push(ord(char)) for char in word.replace('_',' ').replace('\\_','_').replace('\\\\n','\n')[-1:0:-1]),push(0))
                 else:
                     return push(ord(word[1]))
+            try:
+                offset = int(word.split('+')[1])
+                baseword = word.split('+')[0]
+            except:
+                offset = 0
+                baseword = word
             if word.startswith("@"):
                 word = word[1:]
-            elif not word in fvars:
-                fvars += [word]
+            elif not baseword in fvars:
+                fvars[baseword] = offset+1
+            elif fvars[baseword] <= offset:
+                fvars[baseword] = offset+1
             word = ':'+word
         return ['\n'
             ':1',2,':sp',1,4,':sp', # increment the stack pointer
@@ -87,7 +95,8 @@ def fithc(fith, *includes, locoffset=0):
     words['_start'] += ['\n''+4',1,'+2',0,0,'/* Halt */'] # Halt machine
     fir = ""
     for var in fvars: # Add variables to machine
-        fir += f'.{var}\n0\n'
+        data = ' '.join(['0']*fvars[var])
+        fir += f'.{var} /* mem({fvars[var]}) */\n{data}\n\n'
     for word in words: # Add word definitions to machine
         sdword = ' '.join(map(str,words[word])) if words[word] != [] else '\n:1 2 :fp 1 5 :fp :fp +1 -1 0 /* nop return */'
         fir += f'.{word}\n{sdword}\n\n'
