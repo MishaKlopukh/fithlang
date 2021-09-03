@@ -8,6 +8,7 @@
     :sp +6 :sp +1 -1 +1 -1 -1
 ] ;
 :. 12 ! ; /* output a charachter */
+:cr 10 12 ! ;
 :, 11 @ ; /* input a charachter */
 :dup [ /* duplicate top stack item */
     :sp +1 -1 +16 :sp +1 -1 +11
