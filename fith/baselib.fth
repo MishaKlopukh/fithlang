@@ -23,7 +23,7 @@
     +2 2 -1 -1 :sp +2 -1 -1  /* perform operation and push */
 ] ;
 :call [
-    :fp +2 +2 -1 +11 +10 /* Push return address to function stack */
+    :fp +2 +2 -1 +21 +20 /* Push return address to function stack */
     :1 2 :fp 1 4 :fp /* increment the function stack pointer */
     :sp +1 -1 +9 /* Get word addr from stack */
     :1 2 :sp 1 5 :sp /* decrement the stack pointer */
